@@ -251,6 +251,7 @@ class AlarmTableCtrl extends MetricsPanelCtrl {
 
     let newScope = this.$rootScope.$new();
     newScope.alarm = alarm;
+    newScope.source = source;
     this.$rootScope.appEvent('show-modal', {
       templateHtml: '<alarm-details-as-modal dismiss="dismiss()"></alarm-details-as-modal>',
       scope: newScope

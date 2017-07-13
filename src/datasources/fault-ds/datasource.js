@@ -180,8 +180,8 @@ export class OpenNMSFMDatasource {
 
 
     acknowledgeAlarm(alarmId) {
-        this.alarmClient.doUpdate(alarmId, {ack: true});
-    }
+      this.alarmClient.doAck(alarmId);
+  }
 
     unacknowledgeAlarm(alarmId) {
         this.alarmClient.doUpdate(alarmId, {ack: false});
@@ -205,5 +205,21 @@ export class OpenNMSFMDatasource {
 
     closeTicketForAlarm(alarmId) {
         this.alarmClient.doTicketAction(alarmId, "close");
+    }
+
+    saveSticky(alarmId, sticky) {
+      this.alarmClient.saveSticky(alarmId, sticky);
+    }
+
+    deleteSticky(alarmId) {
+      this.alarmClient.deleteSticky(alarmId);
+    }
+
+    saveJournal(alarmId, journal) {
+      this.alarmClient.saveJournal(alarmId, journal);
+    }
+
+    deleteJournal(alarmId) {
+      this.alarmClient.deleteJournal(alarmId);
     }
 }

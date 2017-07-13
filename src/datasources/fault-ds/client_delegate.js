@@ -44,10 +44,10 @@ export class ClientDelegate {
             });
     }
 
-    doUpdate(alarmId, options) {
+    doUpdate(alarmId, options, urlSuffix) {
         var self = this;
         return this.backendSrv.datasourceRequest({
-            url: self.url + '/api/v2/alarms/' + alarmId,
+            url: self.url + '/api/v2/alarms/' + alarmId + urlSuffix ? urlSuffix : "",
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -56,6 +56,13 @@ export class ClientDelegate {
             data: '' // empty data or Content-Type header is reset
         });
     }
+
+    doAck(alarmId) {
+        return this.getAlarmDao()
+            .then(function(alarmDao) {
+                return alarmDao.acknowledge(alarmId);
+            });
+      }
 
     doTicketAction(alarmId, action) {
         var supportedActions = ["create", "update", "close"];
@@ -67,6 +74,39 @@ export class ClientDelegate {
             url: self.url + '/api/v2/alarms/' + alarmId + "/ticket/" + action,
             method: 'POST',
         });
+    }
+
+    doDelete(alarmId, urlSuffix) {
+        var self = this;
+        return this.backendSrv.datasourceRequest({
+            url: self.url + '/api/v2/alarms/' + alarmId + urlSuffix ? urlSuffix : "",
+            method: 'DELETE',
+            headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            params: {},
+            data: '' // empty data or Content-Type header is reset
+        });
+    }
+
+    saveSticky(alarmId, sticky) {
+        return doUpdate(alarmId, {
+            body: sticky.body
+        }, '/memo');
+    }
+
+    deleteSticky(alarmId) {
+        return doDelete(alarmId, '/memo');
+    }
+
+    saveJournal(alarmId, journal) {
+      return doUpdate(alarmId, {
+        body: journal.body
+      }, '/journal');
+    }
+
+    deleteJournal(alarmId) {
+      return doDelete(alarmId, '/journal');
     }
 
     findNodes(options) {
