@@ -59,11 +59,49 @@
         </div>
 
         <div ng-if="editor.index == 1">
-            <h5 class="section-heading">Sticky Memo</h5>
-            <pre class="small">insert sticky here</pre>
-
-            <h5 class="section-heading">Journal Memo</h5>
-            <pre class="small">insert journal here</pre>
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Sticky Memo</h3>
+                    <textarea style="width: 100%" name="stickyMemoBody">{{ alarm.sticky.body }}</textarea>
+                    <div class="btn-group btn-group-sm">
+                        <a type="button" class="btn gf-form-button btn-success" ng-click="saveSticky()"><i class="fa fa-plus"></i>&nbsp;&nbsp;Save</a>
+                        <a type="button" class="btn gf-form-button btn-danger" ng-click="deleteSticky()"><i class="fa fa-minus"></i>&nbsp;&nbsp;Delete</a>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2"><strong>Author:</strong><br/>
+                            {{ alarm.sticky.author }}
+                        </div>
+                        <div class="col-md-5"><strong>Updated:</strong><br/>
+                            {{ alarm.sticky.updated }}
+                        </div>
+                        <div class="col-md-5"><strong>Created:</strong><br/>
+                            {{ alarm.sticky.created }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12" style="height:50px;"></div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Journal Memo</h3>
+                    <textarea style="width: 100%" name="stickyMemoBody">{{ alarm.journal.body }}</textarea>
+                    <div class="btn-group btn-group-sm">
+                        <a type="button" class="btn gf-form-button btn-success" ng-click="saveJournal()"><i class="fa fa-plus"></i>&nbsp;&nbsp;Save</a>
+                        <a type="button" class="btn gf-form-button btn-danger" ng-click="deleteJournal()"><i class="fa fa-minus"></i>&nbsp;&nbsp;Delete</a>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2"><strong>Author:</strong><br/>
+                            {{ alarm.journal.author }}
+                        </div>
+                        <div class="col-md-5"><strong>Updated:</strong><br/>
+                            {{ alarm.journal.updated }}
+                        </div>
+                        <div class="col-md-5"><strong>Created:</strong><br/>
+                            {{ alarm.journal.created }}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div ng-if="editor.index == 2">

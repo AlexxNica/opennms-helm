@@ -6,6 +6,19 @@ export class AlarmDetailsCtrl {
     this.$scope = $scope;
     $scope.editor = { index: 0 };
     $scope.alarm = $scope.$parent.alarm;
+
+    $scope.saveSticky = function() {
+      console.log("save sticky!");
+    };
+    $scope.deleteSticky = function() {
+      console.log("delete sticky!");
+    };
+    $scope.saveJournal = function() {
+      console.log("save journal!");
+    };
+    $scope.deleteJournal = function() {
+      console.log("delete journal!");
+    };
   }
 }
 
