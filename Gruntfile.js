@@ -17,11 +17,11 @@ module.exports = function(grunt) {
         dest: 'dist'
       },
       opennms_to_vendor: {
-        src: 'node_modules/opennms/dist/opennms.min.js',
+        src: 'node_modules/opennms/dist/opennms.js',
         dest: 'vendor/opennms.js'
       },
       opennms_map_to_vendor: {
-        src: 'node_modules/opennms/dist/opennms.min.js.map',
+        src: 'node_modules/opennms/dist/opennms.js.map',
         dest: 'vendor/opennms.js.map'
       },
       vendor_to_dist: {
