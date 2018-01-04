@@ -20,8 +20,10 @@ export class GenericDatasource {
         let start = options.range.from.valueOf();
         let end = options.range.to.valueOf();
         let step = Math.floor((end - start) / options.maxDataPoints);
+        let nodeCriteria = this.templateSrv.replace(options.targets[0].nodeCriteria);
+        let interfaceId = this.templateSrv.replace(options.targets[0].interfaceId);
 
-        return this.client.getSeriesForTopNApplications(N, start, end, step).then(series => {
+        return this.client.getSeriesForTopNApplications(N, start, end, step, nodeCriteria, interfaceId).then(series => {
             return {
                 data: GenericDatasource.toSeries(series)
             };
@@ -56,8 +58,48 @@ export class GenericDatasource {
         return this.q.when([]);
     }
 
+    // Used by template queries
     metricFindQuery(query) {
-        return this.q.when([]);
+        if (query === null || query === undefined || query === "") {
+            return this.$q.resolve([]);
+        }
+        query = this.templateSrv.replace(query);
+
+        let nodeFilterRegex = /nodesWithFlows\((.*)\)/;
+        let nodeResourcesRegex = /interfacesOnNodeWithFlows\((.*)\)/;
+
+        var nodeFilterQuery = query.match(nodeFilterRegex);
+        if (nodeFilterQuery) {
+            return this.metricFindNodeFilterQuery(nodeFilterQuery[1]);
+        }
+
+        var nodeCriteria = query.match(nodeResourcesRegex);
+        if (nodeCriteria) {
+            return this.metricFindNodeResourceQuery(nodeCriteria[1]);
+        }
+
+        return this.$q.resolve([]);
+    }
+
+    metricFindNodeFilterQuery(query) {
+        return this.client.getExporters().then(exporters => {
+            var results = [];
+            _.each(exporters, function (exporter) {
+                results.push({text: exporter.label, value: exporter.criteria, expandable: true});
+            });
+            return results;
+        });
+    }
+
+    metricFindNodeResourceQuery(query) {
+        return this.client.getExporter(query).then(exporter => {
+            console.log(exporter);
+            var results = [];
+            _.each(exporter.interfaces, function (iff) {
+                results.push({text: iff.name + "(" + iff.index + ")", value: iff.index, expandable: true});
+            });
+            return results;
+        });
     }
 
     static toSeries(flowSeries) {
@@ -69,9 +111,6 @@ export class GenericDatasource {
         let series = [];
         let i, j, nRows, nCols, datapoints;
 
-
-        // HACK
-        let step = timestamps[1] - timestamps[0];
 
         if (timestamps !== undefined) {
             nRows = timestamps.length;
@@ -85,13 +124,7 @@ export class GenericDatasource {
                         continue;
                     }
 
-                    // Make the outbounds things negative
-                    let multiplier = 1;
-                    if (labels[i].indexOf("Out") >= 0) {
-                        multiplier = -1;
-                    }
-
-                    datapoints.push([columns[i][j] / step * multiplier, timestamps[j]]);
+                    datapoints.push([columns[i][j], timestamps[j]]);
                 }
 
                 series.push({
