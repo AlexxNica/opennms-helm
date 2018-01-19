@@ -13,6 +13,7 @@ export class GenericDatasource {
     }
 
     query(options) {
+        let self = this;
         let N = 10;
         if (options.targets.length > 0 && options.targets[0].N) {
             N = options.targets[0].N;
@@ -23,9 +24,9 @@ export class GenericDatasource {
         let nodeCriteria = this.templateSrv.replace(options.targets[0].nodeCriteria);
         let interfaceId = this.templateSrv.replace(options.targets[0].interfaceId);
 
-        return this.client.getSeriesForTopNApplications(N, start, end, step, nodeCriteria, interfaceId).then(series => {
+        return this.client.getSeriesForTopNApplications(N, start, end, step, true, nodeCriteria, interfaceId).then(series => {
             return {
-                data: GenericDatasource.toSeries(series)
+                data: self.toSeries(series, options)
             };
         });
     }
@@ -85,7 +86,7 @@ export class GenericDatasource {
         return this.client.getExporters().then(exporters => {
             var results = [];
             _.each(exporters, function (exporter) {
-                results.push({text: exporter.label, value: exporter.criteria, expandable: true});
+                results.push({text: exporter.label, value: exporter.id, expandable: true});
             });
             return results;
         });
@@ -102,14 +103,16 @@ export class GenericDatasource {
         });
     }
 
-    static toSeries(flowSeries) {
+    toSeries(flowSeries, options) {
         let start = flowSeries.start.valueOf();
         let end = flowSeries.end.valueOf();
-        let labels = flowSeries.labels;
         let columns = flowSeries.columns;
+        let values = flowSeries.values;
         let timestamps = flowSeries.timestamps;
         let series = [];
         let i, j, nRows, nCols, datapoints;
+
+        let step = timestamps[1] - timestamps[0];
 
 
         if (timestamps !== undefined) {
@@ -117,6 +120,16 @@ export class GenericDatasource {
             nCols = columns.length;
 
             for (i = 0; i < nCols; i++) {
+                let multiplier = 1;
+                let suffix = " (In)";
+                if (!columns[i].ingress) {
+                    multiplier *= -1;
+                    suffix = " (Out)";
+                }
+                if (options.targets[0].toRate) {
+                    multiplier /= step / 1000;
+                }
+
                 datapoints = [];
                 for (j = 0; j < nRows; j++) {
                     // Skip rows that are out-of-range
@@ -124,11 +137,15 @@ export class GenericDatasource {
                         continue;
                     }
 
-                    datapoints.push([columns[i][j], timestamps[j]]);
+                    if (values[i][j] === 'NaN') {
+                        values[i][j] = null;
+                    }
+
+                    datapoints.push([values[i][j] * multiplier, timestamps[j]]);
                 }
 
                 series.push({
-                    target: labels[i],
+                    target: columns[i].label + suffix,
                     datapoints: datapoints
                 });
             }

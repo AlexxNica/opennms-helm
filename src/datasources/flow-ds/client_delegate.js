@@ -63,10 +63,10 @@ export class ClientDelegate {
         });
     }
 
-    getSeriesForTopNApplications(N, start, end, step, nodeCriteria, interfaceId) {
+    getSeriesForTopNApplications(N, start, end, step, includeOther, nodeCriteria, interfaceId) {
         return this.getFlowDao()
             .then(function(flowDao) {
-                return flowDao.getSeriesForTopNApplications(N, start, end, step, nodeCriteria, interfaceId);
+                return flowDao.getSeriesForTopNApplications(N, start, end, step, includeOther, nodeCriteria, interfaceId);
             });
     }
 
